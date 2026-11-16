@@ -17,6 +17,7 @@ import java.util.Scanner;
 public class ParcInformatique {
 
     private static final String FICHIER_DEFAUT = "parc_helpdesk.txt";
+    private static final String FICHIER_CSV_DEFAUT = "parc_rapport.csv";
     private static final long TAILLE_MAX_IMPORT_OCTETS = 10L * 1024 * 1024; // 10 Mo
     private static final DateTimeFormatter FORMAT_DATE = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
@@ -54,8 +55,7 @@ public class ParcInformatique {
     }
 
     /**
-     * Fiche Helpdesk associée à chaque matériel (indexée par SN)
-     * permettant d'enrichir le suivi sans modifier la classe Materiel existante.
+     * Fiche Helpdesk associée à chaque matériel (indexée par SN).
      */
     private static class FicheHelpdesk {
         private StatutMateriel statut;
@@ -266,10 +266,19 @@ public class ParcInformatique {
 
         int totalTickets = 0;
         int nonAffectes = 0;
+        int totalTelephones = 0;
+        int telephonesMDM = 0;
 
         for (Materiel m : this.materielList) {
             String type = (m.getType() != null) ? m.getType() : "Inconnu";
             parType.put(type, parType.getOrDefault(type, 0) + 1);
+
+            if (m instanceof Telephone) {
+                totalTelephones++;
+                if (((Telephone) m).isSuperviseMDM()) {
+                    telephonesMDM++;
+                }
+            }
 
             FicheHelpdesk fiche = obtenirOuCreerFiche(m.getSN());
             parStatut.put(fiche.statut, parStatut.get(fiche.statut) + 1);
@@ -297,6 +306,9 @@ public class ParcInformatique {
         System.out.println("  - Équipements en incident/répar. : " + enPanneOuRep);
         System.out.println("  - Équipements en production      : " + enService);
         System.out.println("  - Total tickets enregistrés      : " + totalTickets);
+        if (totalTelephones > 0) {
+            System.out.println("  - Conformité MDM (Téléphones)    : " + telephonesMDM + " / " + totalTelephones);
+        }
     }
 
     // ==================== EXPORT / IMPORT SÉCURISÉS (UTF-8) ====================
@@ -349,6 +361,59 @@ public class ParcInformatique {
         } catch (IOException e) {
             System.out.println("[Erreur] Impossible de finaliser la sauvegarde : " + e.getMessage());
         }
+    }
+
+    public void exporterRapportCsv(String nomFichier) {
+        Path cible;
+        try {
+            cible = resoudreCheminSecurise(nomFichier);
+        } catch (IllegalArgumentException e) {
+            System.out.println("[Erreur sécurité] " + e.getMessage());
+            return;
+        }
+
+        Path fichierTemp = cible.resolveSibling(cible.getFileName() + ".tmp");
+
+        try (BufferedWriter writer = Files.newBufferedWriter(fichierTemp, StandardCharsets.UTF_8)) {
+            writer.write('\uFEFF'); // BOM UTF-8 pour une ouverture directe avec accents dans Excel
+            writer.write("SN;Type;Statut;Utilisateur;Localisation;Derniere_MAJ;Nb_Tickets;Details");
+            writer.newLine();
+
+            for (Materiel m : this.materielList) {
+                FicheHelpdesk fiche = obtenirOuCreerFiche(m.getSN());
+                String details = formaterDetailsPourCsv(m);
+                writer.write(m.getSN() + ";"
+                        + protegerCelluleCsv(m.getType()) + ";"
+                        + protegerCelluleCsv(fiche.statut.getLibelle()) + ";"
+                        + protegerCelluleCsv(fiche.utilisateur) + ";"
+                        + protegerCelluleCsv(fiche.localisation) + ";"
+                        + protegerCelluleCsv(fiche.derniereMaj) + ";"
+                        + fiche.tickets.size() + ";"
+                        + protegerCelluleCsv(details));
+                writer.newLine();
+            }
+            writer.flush();
+        } catch (IOException e) {
+            System.out.println("[Erreur] Échec de génération du rapport CSV : " + e.getMessage());
+            return;
+        }
+
+        try {
+            Files.move(fichierTemp, cible, StandardCopyOption.REPLACE_EXISTING);
+            System.out.println("[OK] Rapport Excel CSV généré avec succès : " + cible.getFileName());
+        } catch (IOException e) {
+            System.out.println("[Erreur] Impossible de finaliser le fichier CSV : " + e.getMessage());
+        }
+    }
+
+    private String formaterDetailsPourCsv(Materiel m) {
+        if (m instanceof Telephone) {
+            Telephone t = (Telephone) m;
+            return t.getMarque() + " " + t.getModele() + " | OS: " + t.getOs()
+                    + " | Ligne: " + t.getNumeroLigne() + " | IMEI: " + t.getImei()
+                    + " | MDM: " + (t.isSuperviseMDM() ? "Oui" : "Non");
+        }
+        return m.export().replace(";", " | ");
     }
 
     public void importparc() throws IOException {
@@ -455,21 +520,38 @@ public class ParcInformatique {
     }
 
     private Materiel parserMateriel(String ligneExport) {
-        String[] parts = ligneExport.split(";");
+        String[] parts = ligneExport.split(";", -1);
         if (parts.length < 3) {
             return null;
         }
         try {
             int sn = Integer.parseInt(parts[0].trim());
+            if (sn <= 0) {
+                return null;
+            }
             String type = parts[1].trim();
             if ("Ordinateur".equalsIgnoreCase(type) && parts.length >= 6) {
-                return new Ordinateur(sn, parts[2], parts[3], Integer.parseInt(parts[4].trim()), parts[5]);
+                int ram = Integer.parseInt(parts[4].trim());
+                if (ram <= 0) {
+                    return null;
+                }
+                return new Ordinateur(sn, parts[2], parts[3], ram, parts[5]);
             } else if ("Switch".equalsIgnoreCase(type) && parts.length >= 3) {
-                return new Switch(sn, Integer.parseInt(parts[2].trim()));
+                int ports = Integer.parseInt(parts[2].trim());
+                if (ports <= 0) {
+                    return null;
+                }
+                return new Switch(sn, ports);
             } else if (("Telephone".equalsIgnoreCase(type) || "Téléphone".equalsIgnoreCase(type)) && parts.length >= 3) {
+                if (parts.length >= 8) {
+                    return new Telephone(
+                            sn, parts[2], parts[3], parts[4],
+                            parts[5], parts[6], Boolean.parseBoolean(parts[7].trim())
+                    );
+                }
                 return new Telephone(sn, parts[2]);
             }
-        } catch (NumberFormatException e) {
+        } catch (IllegalArgumentException e) {
             return null;
         }
         return null;
@@ -495,6 +577,17 @@ public class ParcInformatique {
                 .replace("|", "/")
                 .replace("\r", " ")
                 .replace("\n", " ");
+    }
+
+    private static String protegerCelluleCsv(String valeur) {
+        String nettoye = nettoyerTexte(valeur);
+        if (!nettoye.isEmpty()) {
+            char premier = nettoye.charAt(0);
+            if (premier == '=' || premier == '+' || premier == '-' || premier == '@' || premier == '\t') {
+                nettoye = "'" + nettoye;
+            }
+        }
+        return "\"" + nettoye.replace("\"", "\"\"") + "\"";
     }
 
     private static String horodatageActuel() {
@@ -543,6 +636,16 @@ public class ParcInformatique {
         }
     }
 
+    private static String lireTexteOptionnel(Scanner scanner, String message, String valeurParDefaut) {
+        System.out.print(message);
+        String saisie = lireLigne(scanner);
+        if (saisie == null) {
+            return null;
+        }
+        String nettoye = nettoyerTexte(saisie);
+        return nettoye.isEmpty() ? valeurParDefaut : nettoye;
+    }
+
     private static boolean lireConfirmation(Scanner scanner, String message) {
         System.out.print(message + " (O/N) : ");
         String rep = lireLigne(scanner);
@@ -557,14 +660,15 @@ public class ParcInformatique {
         System.out.println("---------------------------------------------------------");
         System.out.println(" 1  - Renommer le parc informatique");
         System.out.println(" 2  - Ajouter un matériel (Ordinateur / Switch / Téléphone)");
-        System.out.println(" 3  - Mettre à jour un matériel (Statut / Utilisateur / Lieu)");
+        System.out.println(" 3  - Mettre à jour un matériel (Fiche Helpdesk / Téléphonie)");
         System.out.println(" 4  - Ajouter un ticket / incident sur un matériel");
         System.out.println(" 5  - Supprimer / Réformer un matériel");
         System.out.println(" 6  - Afficher tout le parc informatique");
         System.out.println(" 7  - Rechercher un matériel (SN, Type, Statut, Utilisateur)");
         System.out.println(" 8  - Tableau de bord & Statistiques du parc");
-        System.out.println(" 9  - Exporter le parc (fichier sécurisé UTF-8)");
+        System.out.println(" 9  - Exporter le parc (sauvegarde sécurisée UTF-8)");
         System.out.println(" 10 - Importer un parc depuis un fichier");
+        System.out.println(" 11 - Exporter un rapport CSV (compatible Excel)");
         System.out.println(" 0  - Quitter");
         System.out.println("=========================================================");
     }
@@ -604,10 +708,53 @@ public class ParcInformatique {
                 nouveau = new Switch(sn, ports);
             }
         } else if (type == 3) {
-            String os = lireTexteNonVide(scanner, "Système d'exploitation (OS) : ");
-            if (os != null) {
-                nouveau = new Telephone(sn, os);
+            String os = lireTexteNonVide(scanner, "Système d'exploitation (ex: iOS 18, Android 15) : ");
+            if (os == null) {
+                return;
             }
+            String marque = lireTexteOptionnel(scanner, "Marque (ex: Apple, Samsung, Cisco) [Entrée = Non renseigné] : ", "Non renseigné");
+            if (marque == null) {
+                return;
+            }
+            String modele = lireTexteOptionnel(scanner, "Modèle (ex: iPhone 15, Galaxy S24) [Entrée = Non renseigné] : ", "Non renseigné");
+            if (modele == null) {
+                return;
+            }
+
+            Telephone tel = new Telephone(sn, os);
+            tel.setMarque(marque);
+            tel.setModele(modele);
+
+            while (true) {
+                System.out.print("Numéro de ligne (ex: 4012, +33 6 12 34 56 78) [Entrée = Non attribué] : ");
+                String ligne = lireLigne(scanner);
+                if (ligne == null) {
+                    return;
+                }
+                try {
+                    tel.setNumeroLigne(ligne);
+                    break;
+                } catch (IllegalArgumentException e) {
+                    System.out.println("[Erreur] " + e.getMessage());
+                }
+            }
+
+            while (true) {
+                System.out.print("IMEI (15 chiffres) [Entrée = Non renseigné] : ");
+                String imei = lireLigne(scanner);
+                if (imei == null) {
+                    return;
+                }
+                try {
+                    tel.setImei(imei);
+                    break;
+                } catch (IllegalArgumentException e) {
+                    System.out.println("[Erreur] " + e.getMessage());
+                }
+            }
+
+            tel.setSuperviseMDM(lireConfirmation(scanner, "L'appareil est-il enrôlé dans le MDM ?"));
+            nouveau = tel;
         }
 
         if (nouveau != null && parc.Add(nouveau)) {
@@ -633,44 +780,86 @@ public class ParcInformatique {
         }
 
         FicheHelpdesk fiche = parc.obtenirOuCreerFiche(sn);
-        System.out.println("\nFiche actuelle (SN " + sn + ") :");
-        System.out.println(" 1 - Statut       : " + fiche.statut.getLibelle());
-        System.out.println(" 2 - Utilisateur  : " + fiche.utilisateur);
-        System.out.println(" 3 - Localisation : " + fiche.localisation);
-        System.out.println(" 0 - Retour");
+        boolean estTelephone = (m instanceof Telephone);
+        int maxChoix = estTelephone ? 6 : 3;
 
-        Integer choix = lireEntier(scanner, "Champ à modifier : ", 0, 3);
-        if (choix == null || choix == 0) {
-            return;
-        }
+        while (true) {
+            System.out.println("\nFiche actuelle (SN " + sn + ") :");
+            System.out.println(" 1 - Statut          : " + fiche.statut.getLibelle());
+            System.out.println(" 2 - Utilisateur     : " + fiche.utilisateur);
+            System.out.println(" 3 - Localisation    : " + fiche.localisation);
+            if (estTelephone) {
+                Telephone tel = (Telephone) m;
+                System.out.println(" 4 - Numéro de ligne : " + tel.getNumeroLigne());
+                System.out.println(" 5 - IMEI            : " + tel.getImei());
+                System.out.println(" 6 - Enrôlement MDM  : " + (tel.isSuperviseMDM() ? "Oui" : "Non"));
+            }
+            System.out.println(" 0 - Retour au menu");
 
-        if (choix == 1) {
-            StatutMateriel[] statuts = StatutMateriel.values();
-            for (int i = 0; i < statuts.length; i++) {
-                System.out.println(" " + (i + 1) + " - " + statuts[i].getLibelle());
+            Integer choix = lireEntier(scanner, "Champ à modifier : ", 0, maxChoix);
+            if (choix == null || choix == 0) {
+                return;
             }
-            Integer idx = lireEntier(scanner, "Nouveau statut : ", 1, statuts.length);
-            if (idx != null) {
-                fiche.statut = statuts[idx - 1];
-                fiche.toucherMaj();
-                System.out.println("[OK] Statut mis à jour : " + fiche.statut.getLibelle());
-            }
-        } else if (choix == 2) {
-            String user = lireTexteNonVide(scanner, "Nom de l'utilisateur / service (ou 'Non affecté') : ");
-            if (user != null) {
-                fiche.utilisateur = user;
-                if (!"Non affecté".equalsIgnoreCase(user) && fiche.statut == StatutMateriel.EN_STOCK) {
-                    fiche.statut = StatutMateriel.EN_SERVICE;
+
+            if (choix == 1) {
+                StatutMateriel[] statuts = StatutMateriel.values();
+                for (int i = 0; i < statuts.length; i++) {
+                    System.out.println(" " + (i + 1) + " - " + statuts[i].getLibelle());
                 }
+                Integer idx = lireEntier(scanner, "Nouveau statut : ", 1, statuts.length);
+                if (idx != null) {
+                    fiche.statut = statuts[idx - 1];
+                    fiche.toucherMaj();
+                    System.out.println("[OK] Statut mis à jour : " + fiche.statut.getLibelle());
+                }
+            } else if (choix == 2) {
+                String user = lireTexteNonVide(scanner, "Nom de l'utilisateur / service (ou 'Non affecté') : ");
+                if (user != null) {
+                    fiche.utilisateur = user;
+                    if (!"Non affecté".equalsIgnoreCase(user) && fiche.statut == StatutMateriel.EN_STOCK) {
+                        fiche.statut = StatutMateriel.EN_SERVICE;
+                    }
+                    fiche.toucherMaj();
+                    System.out.println("[OK] Utilisateur mis à jour.");
+                }
+            } else if (choix == 3) {
+                String lieu = lireTexteNonVide(scanner, "Localisation (bâtiment, bureau, salle) : ");
+                if (lieu != null) {
+                    fiche.localisation = lieu;
+                    fiche.toucherMaj();
+                    System.out.println("[OK] Localisation mise à jour.");
+                }
+            } else if (estTelephone && choix == 4) {
+                Telephone tel = (Telephone) m;
+                System.out.print("Nouveau numéro de ligne (Entrée = Non attribué) : ");
+                String ligne = lireLigne(scanner);
+                if (ligne != null) {
+                    try {
+                        tel.setNumeroLigne(ligne);
+                        fiche.toucherMaj();
+                        System.out.println("[OK] Numéro de ligne mis à jour.");
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("[Erreur] " + e.getMessage());
+                    }
+                }
+            } else if (estTelephone && choix == 5) {
+                Telephone tel = (Telephone) m;
+                System.out.print("Nouvel IMEI à 15 chiffres (Entrée = Non renseigné) : ");
+                String imei = lireLigne(scanner);
+                if (imei != null) {
+                    try {
+                        tel.setImei(imei);
+                        fiche.toucherMaj();
+                        System.out.println("[OK] IMEI mis à jour.");
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("[Erreur] " + e.getMessage());
+                    }
+                }
+            } else if (estTelephone && choix == 6) {
+                Telephone tel = (Telephone) m;
+                tel.setSuperviseMDM(lireConfirmation(scanner, "L'appareil est-il enrôlé dans le MDM ?"));
                 fiche.toucherMaj();
-                System.out.println("[OK] Utilisateur mis à jour.");
-            }
-        } else if (choix == 3) {
-            String lieu = lireTexteNonVide(scanner, "Localisation (bâtiment, bureau, salle) : ");
-            if (lieu != null) {
-                fiche.localisation = lieu;
-                fiche.toucherMaj();
-                System.out.println("[OK] Localisation mise à jour.");
+                System.out.println("[OK] Statut MDM mis à jour.");
             }
         }
     }
@@ -749,7 +938,7 @@ public class ParcInformatique {
             boolean continuer = true;
             while (continuer) {
                 afficherMenu(parc);
-                Integer choix = lireEntier(scanner, "Votre choix : ", 0, 10);
+                Integer choix = lireEntier(scanner, "Votre choix : ", 0, 11);
                 if (choix == null) {
                     break;
                 }
@@ -816,6 +1005,13 @@ public class ParcInformatique {
                             } catch (IOException e) {
                                 System.out.println("[Erreur] Problème lors de la lecture du fichier : " + e.getMessage());
                             }
+                        }
+                        break;
+                    case 11:
+                        System.out.print("Nom du rapport CSV [Entrée pour '" + FICHIER_CSV_DEFAUT + "'] : ");
+                        String ficCsv = lireLigne(scanner);
+                        if (ficCsv != null) {
+                            parc.exporterRapportCsv(ficCsv.trim().isEmpty() ? FICHIER_CSV_DEFAUT : ficCsv.trim());
                         }
                         break;
                     default:
