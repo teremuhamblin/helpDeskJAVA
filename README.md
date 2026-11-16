@@ -1,9 +1,8 @@
 ###### README.md >> markdown
-# helpDeskJAVA
 
 <div align="center">
 
-### 🛠️ 𝐇𝐄𝐋𝐏𝐃𝐄𝐒𝐊
+# 🛠️ helpDeskJAVA
 𝐆𝐄𝐒𝐓𝐈𝐎𝐍 𝐃𝐄 𝐏𝐀𝐑𝐂 𝐈𝐓
 
 ### *Solution Java moderne de gestion d'actifs informatiques (ITAM), suivi d'incidents et audit sécurité*
@@ -63,7 +62,7 @@
 ## 🗂️ 𝐀𝐫𝐜𝐡𝐢𝐭𝐞𝐜𝐭𝐮𝐫𝐞 𝐝𝐮 𝐩𝐫𝐨𝐣𝐞𝐭
 
 ```text
-📦 Projet-Helpdesk/
+📦 helpDeskJAVA/
 ├── 📂 Sources/
 │   ├── ☕ Materiel.java        # Classe mère : actif, fournisseur, coûts & garanties
 │   ├── ☕ Ordinateur.java      # Postes de travail, MAC, Hostname & cybersécurité
