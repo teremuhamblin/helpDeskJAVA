@@ -1,3 +1,69 @@
-/.vscode
-/bin
+# ==============================================================================
+#  JAVA : Fichiers compilés & artefacts
+# ==============================================================================
+*.class
+*.ctxt
+bin/
+out/
+build/
+target/
+
+# Archives générées (on conserve toutefois d'éventuelles dépendances dans lib/)
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+!lib/*.jar
+!Sources/lib/*.jar
+
+# Journaux de crash de la JVM
+hs_err_pid*
+replay_pid*
+
+# ==============================================================================
+#  VS CODE & EXTENSIONS JAVA (Language Support for Java / Eclipse JDT)
+# ==============================================================================
+.vscode/
+*.code-workspace
+.project
+.classpath
+.settings/
+.factorypath
+.jdt/
+
+# Autres IDE (au cas où le projet serait ouvert dans IntelliJ / NetBeans)
+.idea/
+*.iml
+*.iws
+*.ipr
+nbproject/
+
+# ==============================================================================
+#  FICHIERS GÉNÉRÉS PAR L'APPLICATION HELPDESK (ParcInformatique)
+# ==============================================================================
 parc.txt
+parc_helpdesk.txt
+parc_*.txt
+parc_*.csv
+*.bak
+*.tmp
+*.log
+
+# ==============================================================================
+#  SYSTÈME D'EXPLOITATION & ÉDITEURS (Windows / macOS / Linux)
+# ==============================================================================
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+*~
+*.swp
+*.swo
+
+# ==============================================================================
+#  PROTECTION DES SOURCES JAVA
+# ==============================================================================
+!Sources/**/*.java
