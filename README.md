@@ -1,157 +1,118 @@
 <div align="center">
 
 # 🛠️ helpDeskJAVA
-## Gestion de parc IT
+### Gestion de parc informatique & Helpdesk en Java
 
-### *Solution Java moderne de gestion d'actifs informatiques (ITAM), suivi d'incidents et audit sécurité*
+Une application console pour inventorier les équipements, suivre les incidents et surveiller les principaux indicateurs du parc IT.
 
-<br/>
-
-![Java](https://img.shields.io/badge/Java-JDK%2011%2B%20%2F%2017%2B-FACC15?style=for-the-badge&logo=openjdk&logoColor=white&labelColor=6B21A8)
+![Java](https://img.shields.io/badge/Java-JDK%2011%2B-FACC15?style=for-the-badge&logo=openjdk&logoColor=white&labelColor=6B21A8)
 ![Architecture](https://img.shields.io/badge/Architecture-POO%20%7C%20ITIL-6B21A8?style=for-the-badge&labelColor=FACC15)
-![Sécurité](https://img.shields.io/badge/S%C3%A9curit%C3%A9-UTF--8%20%7C%20Validation-FACC15?style=for-the-badge&labelColor=6B21A8)
-![Export](https://img.shields.io/badge/Export-TXT%20Atomique%20%26%20CSV-6B21A8?style=for-the-badge&labelColor=FACC15)
-![Git](https://img.shields.io/badge/Git-Sources%2F%20Ready-FACC15?style=for-the-badge&logo=git&logoColor=white&labelColor=6B21A8)
-![Licence](https://img.shields.io/badge/Licence-MIT-6B21A8?style=for-the-badge&logo=opensourceinitiative&logoColor=6B21A8&labelColor=FACC15)
-
-<br/>
-
-> 💡 **Un outil console complet, fiable et sécurisé** pour piloter vos **ordinateurs**, **commutateurs réseau (switchs)** et **téléphones professionnels**, suivre vos **tickets Helpdesk** et auditer votre **conformité cyber**.
+![Données](https://img.shields.io/badge/Donn%C3%A9es-UTF--8-FACC15?style=for-the-badge&labelColor=6B21A8)
+![Exports](https://img.shields.io/badge/Exports-TXT%20%7C%20CSV-6B21A8?style=for-the-badge&labelColor=FACC15)
+![Licence](https://img.shields.io/badge/Licence-MIT-FACC15?style=for-the-badge&logo=opensourceinitiative&logoColor=white&labelColor=6B21A8)
 
 </div>
 
 ---
 
-## 🧭 𝐒𝐨𝐦𝐦𝐚𝐢𝐫𝐞 𝐨𝐩é𝐫𝐚𝐭𝐢𝐨𝐧𝐧𝐞𝐥
+## Sommaire
 
-- [📌 Présentation](#-presentation)
-- [✨ Fonctionnalités clés](#-fonctionnalites)
-- [🗂️ Architecture du projet](#-architecture)
-- [⚙️ Prérequis & Installation](#-installation)
-- [🚀 Compilation & Lancement](#-lancement)
-- [📋 Guide du Menu (0 à 12)](#-menu)
-- [🛡️ Sécurité & Persistance des données](#-securite)
-- [📄 Licence](#-licence)
+- [Présentation](#présentation)
+- [Fonctionnalités](#fonctionnalités)
+- [Documentation et structure](#documentation-et-structure)
+- [Prérequis et installation](#prérequis-et-installation)
+- [Compilation et lancement](#compilation-et-lancement)
+- [Guide du menu](#guide-du-menu)
+- [Sécurité et persistance](#sécurité-et-persistance)
+- [Licence](#licence)
 
----
+## Présentation
 
-<a id="presentation"></a>
-## 📌 𝐏𝐫é𝐬𝐞𝐧𝐭𝐚𝐭𝐢𝐨𝐧
+**helpDeskJAVA** est une application Java orientée objet de gestion de parc informatique (ITAM) et de support Helpdesk. Elle permet de centraliser les informations sur les équipements, de suivre leur état et leurs interventions, puis d’exporter les données et rapports.
 
-**Helpdesk & Parc IT** est une application Java orientée objet conçue selon les bonnes pratiques **Helpdesk / ITAM** (*IT Asset Management*). Elle permet à un technicien support ou administrateur de centraliser l'inventaire, gérer le cycle de vie des équipements, enregistrer les interventions et exporter des rapports exploitables sous Excel.
+L’application se pilote depuis un menu en console et prend en charge les équipements suivants :
 
-Le projet vise à fournir :
+- ordinateurs,
+- commutateurs réseau,
+- téléphones professionnels.
 
-- une gestion fiable du parc informatique,
-- un suivi complet des incidents et tickets,
-- un contrôle des actifs et des garanties,
-- une meilleure visibilité sur les risques de sécurité.
+## Fonctionnalités
 
----
-
-<a id="fonctionnalites"></a>
-## ✨ 𝐅𝐨𝐧𝐜𝐭𝐢𝐨𝐧𝐧𝐚𝐥𝐢𝐭é𝐬 𝐜𝐥é𝐬
-
-| Domaine | Fonctionnalités incluses |
+| Domaine | Capacités |
 | :--- | :--- |
-| 🖥️ **Postes (`Ordinateur`)** | OS, CPU, RAM, GPU, Stockage, Format, **Hostname**, **Adresse MAC** normalisée, suivi **BitLocker/FileVault** & **EDR/Antivirus** |
-| 🌐 **Réseau (`Commutateur`)** | Nombre de ports, taux d'occupation, **PoE**, administrable L2/L3, **IPv4 de gestion**, **VLAN (802.1Q)** |
-| 📱 **Mobilité (`Telephone`)** | OS, marque, modèle, numéro de ligne, validation **IMEI (15 chiffres)**, statut d'enrôlement **MDM** |
-| 📦 **Actifs (`Materiel`)** | Unicité par **SN**, N° d'inventaire, fournisseur, dates d'achat/garantie, prix HT, calcul des **jours de garantie restants** |
-| 🎫 **Suivi Helpdesk** | Statuts ITIL (`En stock`, `En service`, `En panne`, `En réparation`, `Réformé`), affectation utilisateur, localisation, **tickets datés** |
-| 🚨 **Audit & Pilotage** | Détection des **garanties expirées (< 30 j)**, postes non conformes, switchs saturés (`>= 85%`), tableau de bord financier & technique |
+| **Ordinateurs** | Système d’exploitation, caractéristiques matérielles, hostname, adresse MAC, suivi BitLocker/FileVault et EDR/antivirus |
+| **Commutateurs** | Ports, occupation, PoE, gestion L2/L3, IPv4 de gestion et VLAN 802.1Q |
+| **Téléphones** | Système d’exploitation, marque, modèle, ligne, validation de l’IMEI et statut MDM |
+| **Inventaire** | Numéro de série unique, numéro d’inventaire, fournisseur, achat, garantie et prix HT |
+| **Helpdesk** | Affectation, localisation, statuts de cycle de vie et tickets datés |
+| **Audit et pilotage** | Alertes de garantie, contrôles de conformité, occupation réseau et tableau de bord |
+| **Import / export** | Sauvegarde texte, import avec remplacement ou fusion, export de rapport CSV |
 
----
+## Documentation et structure
 
-<a id="architecture"></a>
-## 🗂️ 𝐀𝐫𝐜𝐡𝐢𝐭𝐞𝐜𝐭𝐮𝐫𝐞 𝐝𝐮 𝐩𝐫𝐨𝐣𝐞𝐭
+La documentation de la structure du projet se trouve dans [`Docs/structure.md`](Docs/structure.md).
 
-La documentation technique du projet est disponible dans le dossier `Docs/`.
+- `Sources/` — code source Java
+- `Docs/` — documentation du projet
+- `LICENSE` — licence MIT
 
-- `Sources/` : classes Java de l'application
-- `Docs/` : documentation technique et structure du projet
-- `README.md` : documentation générale
-- `LICENSE` : licence du projet
+## Prérequis et installation
 
-Pour consulter la structure détaillée :
+- JDK 11 ou supérieur (JDK 17 ou 21 recommandé)
+- Git
+- Facultatif : Visual Studio Code avec l’Extension Pack for Java
 
-- `Docs/structure.md`
+Clonez le dépôt :
 
----
-
-## Documentation du projet
-
-<a id="installation"></a>
-### ⚙️ 𝐏𝐫é𝐫𝐞𝐪𝐮𝐢𝐬 & 𝐈𝐧𝐬𝐭𝐚𝐥𝐥𝐚𝐭𝐢𝐨𝐧
-
-#### Prérequis
-- Java Development Kit (JDK) : version 11 ou supérieure (JDK 17 / 21 recommandé)
-- Éditeur conseillé : Visual Studio Code avec l'extension Extension Pack for Java
-- Git pour cloner le dépôt
-
-#### Cloner le dépôt
-```text
+```bash
 git clone https://github.com/teremuhamblin/helpDeskJAVA.git
 cd helpDeskJAVA
 ```
 
-<a id="lancement"></a>
-### 🚀 𝐂𝐨𝐦𝐩𝐢𝐥𝐚𝐭𝐢𝐨𝐧 & 𝐋𝐚𝐧𝐜𝐞𝐦𝐞𝐧𝐭
+## Compilation et lancement
 
-#### Option 1 — Via le terminal (recommandé, avec encodage UTF-8)
+Depuis la racine du dépôt, créez le dossier de sortie, compilez les sources puis lancez l’application :
+
 ```bash
-# Compiler toutes les classes depuis Sources/ vers bin/
+mkdir -p bin
 javac -encoding UTF-8 -d bin Sources/*.java
-```
-
-```bash
-# Lancer l'application Helpdesk
 java -cp bin Helpdesk
 ```
 
-#### Option 2 — Via Visual Studio Code
-- Ouvrez le dossier du projet dans VS Code.
-- Ouvrez `Sources/Helpdesk.java`.
-- Cliquez sur Run (ou appuyez sur F5).
+Dans Visual Studio Code, ouvrez le dossier du projet, puis `Sources/Helpdesk.java` et lancez la classe avec **Run** ou **F5**.
 
-<a id="menu"></a>
-### 📋 𝐆𝐮𝐢𝐝𝐞 𝐝𝐮 𝐌𝐞𝐧𝐮 (𝟎 à 𝟏𝟐)
+## Guide du menu
 
 | Touche | Action | Description |
 | :---: | :--- | :--- |
-| 1 | Renommer le parc | Définit ou modifie le nom du parc informatique |
-| 2 | Ajouter un matériel | Assistant complet pour Ordinateur, Commutateur ou Téléphone |
-| 3 | Mettre à jour | Modifie fiche Helpdesk, infos admin/garantie et champs techniques |
-| 4 | Ajouter un ticket | Ajoute une intervention datée et passe en panne si besoin |
-| 5 | Supprimer / Réformer | Suppression sécurisée par SN avec confirmation O/N |
-| 6 | Afficher tout le parc | Liste complète triée automatiquement par numéro de série |
-| 7 | Rechercher | Par SN, type, statut, utilisateur ou mot-clé global |
-| 8 | Audit & Alertes | Liste garanties expirées, failles postes/MDM et saturation réseau |
-| 9 | Tableau de bord | Statistiques complètes + valorisation financière HT |
-| 10 | Exporter le parc | Sauvegarde complète sécurisée (`parc_helpdesk.txt`) |
-| 11 | Importer un parc | Chargement transactionnel (remplacer ou fusionner sans doublons) |
-| 12 | Exporter rapport CSV | Génère `parc_rapport.csv` prêt pour Microsoft Excel |
-| 0 | Quitter | Fermeture propre avec demande de confirmation |
+| 1 | Renommer le parc | Définit ou modifie le nom du parc |
+| 2 | Ajouter un matériel | Ajoute un ordinateur, un commutateur ou un téléphone |
+| 3 | Mettre à jour | Modifie les informations Helpdesk, administratives, de garantie ou techniques |
+| 4 | Ajouter un ticket | Enregistre une intervention datée |
+| 5 | Supprimer / réformer | Supprime un matériel par son numéro de série après confirmation |
+| 6 | Afficher le parc | Affiche les équipements triés par numéro de série |
+| 7 | Rechercher | Recherche par numéro de série, type, statut, utilisateur ou mot-clé |
+| 8 | Audit et alertes | Consulte les alertes de garantie, de conformité et de saturation réseau |
+| 9 | Tableau de bord | Affiche les statistiques et la valorisation financière HT |
+| 10 | Exporter le parc | Enregistre les données dans `parc_helpdesk.txt` |
+| 11 | Importer un parc | Importe les données en remplaçant ou en fusionnant le parc |
+| 12 | Exporter un rapport CSV | Génère `parc_rapport.csv` pour tableur |
+| 0 | Quitter | Ferme l’application après confirmation |
 
-<a id="securite"></a>
-### 🛡️ 𝐒é𝐜𝐮𝐫𝐢𝐭é & 𝐏𝐞𝐫𝐬𝐢𝐬𝐭𝐚𝐧𝐜𝐞 𝐝𝐞𝐬 𝐝𝐨𝐧𝐧é𝐞𝐬
+## Sécurité et persistance
 
-Ce projet a été renforcé pour limiter les risques liés à la corruption, à la mauvaise saisie et à la sécurité des données :
+- Les données sont enregistrées dans un format texte structuré en UTF-8 ; le projet n’utilise pas `ObjectInputStream`.
+- L’écriture du fichier de parc passe par un fichier temporaire et une copie de secours `.bak`.
+- Les noms de fichiers autorisés sont validés pour limiter les risques de traversée de chemin (*path traversal*).
+- Les champs exportés en CSV sont neutralisés contre les formules de tableur, et un BOM UTF-8 est ajouté pour la compatibilité.
+- Les entrées font l’objet de contrôles, notamment pour les numéros de série, les adresses IPv4 et MAC, les VLAN et les IMEI.
 
-- *Le projet n'utilise plus la sérialisation binaire Java (ObjectInputStream) afin d'écarter tout risque de faille de désérialisation.*
-- *Format texte UTF-8 structuré (parc_helpdesk.txt) : enregistre les blocs PARC;, MAT;, ADMIN; et HD;.*
-- *Écriture atomique et sauvegarde : passage par un fichier .tmp puis création automatique d'une copie de secours .bak.*
-- *Protection contre le Path Traversal : validation stricte des noms de fichiers autorisés.*
-- *Protection CSV Excel : neutralisation des formules dangereuses (=, +, -, @) et ajout du BOM UTF-8.*
-- *Validation des entrées : contrôle d'unicité des SN, format IPv4, VLAN 1..4094, adresse MAC, IMEI et assainissement des séparateurs.*
+## Licence
 
-<a id="licence"></a>
-### 📄 𝐋𝐢𝐜𝐞𝐧𝐜𝐞
->Ce projet est distribué sous licence MIT
-- — voir le fichier LICENSE pour plus de détails.
+Ce projet est distribué sous licence MIT. Consultez le fichier [`LICENSE`](LICENSE) pour plus de détails.
 
 ---
 
 <div align="center">
-Fait avec ☕ en Java — Standard Helpdesk & Parc Informatique Moderne
+Fait avec ☕ en Java
 </div>
