@@ -8,11 +8,11 @@ import java.util.regex.Pattern;
  */
 public class Computer extends Equipment {
 
+    private static final long serialVersionUID = 2L;
+
     private static final int MAX_RAM_GB = 4096;
     private static final int MAX_STORAGE_GB = 102_400; // 100 TB
-    private static final int MAX_TEXT_LENGTH = 120;
 
-    private static final String DEFAULT_UNSET = "Unset";
     private static final String DEFAULT_UNKNOWN = "Unknown";
     private static final String DEFAULT_GPU = "Integrated / Unknown";
 
@@ -73,7 +73,8 @@ public class Computer extends Equipment {
     }
 
     public void setOs(String os) {
-        this.os = cleanText(os, DEFAULT_UNKNOWN, MAX_TEXT_LENGTH);
+        String cleaned = cleanText(os, "", MAX_TEXT_LENGTH);
+        this.os = isUnsetValue(cleaned) ? DEFAULT_UNKNOWN : cleaned;
     }
 
     public String getCpu() {
@@ -81,7 +82,8 @@ public class Computer extends Equipment {
     }
 
     public void setCpu(String cpu) {
-        this.cpu = cleanText(cpu, DEFAULT_UNKNOWN, MAX_TEXT_LENGTH);
+        String cleaned = cleanText(cpu, "", MAX_TEXT_LENGTH);
+        this.cpu = isUnsetValue(cleaned) ? DEFAULT_UNKNOWN : cleaned;
     }
 
     public int getRamGb() {
@@ -101,7 +103,8 @@ public class Computer extends Equipment {
     }
 
     public void setGpu(String gpu) {
-        this.gpu = cleanText(gpu, DEFAULT_GPU, MAX_TEXT_LENGTH);
+        String cleaned = cleanText(gpu, "", MAX_TEXT_LENGTH);
+        this.gpu = isUnsetValue(cleaned) ? DEFAULT_GPU : cleaned;
     }
 
     public String getBrand() {
@@ -109,7 +112,8 @@ public class Computer extends Equipment {
     }
 
     public void setBrand(String brand) {
-        this.brand = cleanText(brand, DEFAULT_UNSET, MAX_TEXT_LENGTH);
+        String cleaned = cleanText(brand, "", MAX_TEXT_LENGTH);
+        this.brand = isUnsetValue(cleaned) ? DEFAULT_UNSET : cleaned;
     }
 
     public String getModel() {
@@ -117,7 +121,8 @@ public class Computer extends Equipment {
     }
 
     public void setModel(String model) {
-        this.model = cleanText(model, DEFAULT_UNSET, MAX_TEXT_LENGTH);
+        String cleaned = cleanText(model, "", MAX_TEXT_LENGTH);
+        this.model = isUnsetValue(cleaned) ? DEFAULT_UNSET : cleaned;
     }
 
     public String getFormFactor() {
@@ -125,7 +130,8 @@ public class Computer extends Equipment {
     }
 
     public void setFormFactor(String formFactor) {
-        this.formFactor = cleanText(formFactor, DEFAULT_UNSET, MAX_TEXT_LENGTH);
+        String cleaned = cleanText(formFactor, "", MAX_TEXT_LENGTH);
+        this.formFactor = isUnsetValue(cleaned) ? DEFAULT_UNSET : cleaned;
     }
 
     public int getStorageGb() {
@@ -198,6 +204,7 @@ public class Computer extends Equipment {
 
     // ==================== DISPLAY & EXPORT ====================
 
+    @Override
     public String toFormattedString() {
         String storageLabel = storageGb > 0 ? storageGb + " GB" : DEFAULT_UNSET;
         return new StringBuilder(256)
@@ -240,46 +247,6 @@ public class Computer extends Equipment {
         );
     }
 
-    // ==================== UTILITIES & OBJECT CONTRACTS ====================
-
-    private static int validateSerialNumber(int serialNumber) {
-        if (serialNumber <= 0) {
-            throw new IllegalArgumentException("Computer serial number (SN) must be strictly positive.");
-        }
-        return serialNumber;
-    }
-
-    private static boolean isUnsetValue(String value) {
-        return value.isEmpty()
-                || DEFAULT_UNSET.equalsIgnoreCase(value)
-                || "Non renseigné".equalsIgnoreCase(value)
-                || "Non renseignée".equalsIgnoreCase(value);
-    }
-
-    private static String cleanText(String text, String defaultValue, int maxLength) {
-        if (text == null) {
-            return defaultValue;
-        }
-        StringBuilder sb = new StringBuilder(Math.min(text.length(), maxLength));
-        for (int i = 0; i < text.length(); i++) {
-            char c = text.charAt(i);
-            if (c == ';') {
-                sb.append(',');
-            } else if (c == '|') {
-                sb.append('/');
-            } else if (c == '\r' || c == '\n' || c == '\t') {
-                sb.append(' ');
-            } else if (!Character.isISOControl(c)) {
-                sb.append(c);
-            }
-        }
-        String cleaned = sb.toString().trim();
-        if (cleaned.isEmpty()) {
-            return defaultValue;
-        }
-        return cleaned.length() > maxLength ? cleaned.substring(0, maxLength) : cleaned;
-    }
-
     @Override
     public String toString() {
         return "Computer{sn=" + getSerialNumber()
@@ -287,23 +254,6 @@ public class Computer extends Equipment {
                 + ", model='" + brand + ' ' + model + '\''
                 + ", os='" + os + '\''
                 + ", ramGb=" + ramGb + '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Computer other = (Computer) o;
-        return getSerialNumber() == other.getSerialNumber();
-    }
-
-    @Override
-    public int hashCode() {
-        return Integer.hashCode(getSerialNumber());
     }
 
     // ==================== FLUENT BUILDER ====================
