@@ -2,19 +2,40 @@
 # helpDeskJAVA
 
 ## 🗂️ 𝐀𝐫𝐜𝐡𝐢𝐭𝐞𝐜𝐭𝐮𝐫𝐞 𝐝𝐮 𝐩𝐫𝐨𝐣𝐞𝐭
+### Base Stable v1.0
 ```text
 📦 helpDeskJAVA/
-├── 📂 .github/                     # Fichier de gouvernance et de sécurité 
+├── 📂 .github/ # Fichier de gouvernance et de sécurité 
 ├── 📂 Sources/
-│   ├── ☕ Materiel.java        # Classe mère : actif, fournisseur, coûts & garanties
-│   ├── ☕ Computer.java      # Postes de travail, MAC, Hostname & cybersécurité
-│   ├── ☕ Commutateur.java          # Commutateurs réseau, ports, IP, VLAN & PoE
-│   ├── ☕ Phone.java       # Flotte mobile, ligne, IMEI & conformité MDM
+│   ├── ☕ README.md 
+│   ├── ☕ Materiel.java       # Classe mère : actif, fournisseur, coûts & garanties
+│   ├── ☕ Computer.java       # Postes de travail, MAC, Hostname & cybersécurité
+│   ├── ☕ Commutateur.java    # Commutateurs réseau, ports, IP, VLAN & PoE
+│   ├── ☕ Phone.java          # Flotte mobile, ligne, IMEI & conformité MDM
 │   └── ☕ Helpdesk.java       # Moteur principal, menu, audit & import/export
-├── 📂 Docs/                    # Documentation generale
-├── 📂 bin/                     # Fichiers compilés (.class) — ignorés par Git
-├── 📂 lib/                     # Dépendances éventuelles (.jar)
+├── 📂 Docs/
+│   ├── ☕ README.md           # Documentation generale
+├── 📂 bin/
+│   ├── ☕ README.md           # Fichiers compilés (.class) — ignorés par Git
+├── 📂 lib/
+│   ├── ☕ README.md           # Dépendances éventuelles (.jar)
 ├── 🙈 .gitignore               # Règles Git Java / VS Code / exports Helpdesk
 ├── 📄 LICENSE                  # Licence MIT
 └── 📘 README.md                #
+```
+
+### 📦 Structure du dossier Sources/
+### Mise a jour v1.1 Stable
+```text
+Sources/
+    ├── README.md 
+    ├── Main.java                 # Point d'entrée (ou Helpdesk.java)
+    ├── model/
+    │   ├── README.md            # Les entités / objets du parc informatique
+    │   ├── Materiel.java
+    │   ├── Computer.java
+    │   ├── Commutateur.java
+    │   └── Phone.java
+    └── service/                  # Logique métier (ajout, recherche, gestion des tickets...)
+        └── ParcService.java
 ```
