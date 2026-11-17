@@ -25,7 +25,7 @@
 ```
 
 ### 📦 Structure du dossier Sources/
-### Mise a jour v1.1 Stable
+### Mise à jour v1.1 Stable
 ```text
 Sources/
     ├── README.md 
@@ -38,4 +38,18 @@ Sources/
     │   └── Phone.java
     └── service/                  # Logique métier (ajout, recherche, gestion des tickets...)
         └── ParcService.java
+```
+
+### Convention standard
+#### Mise à jour v1.2 Stable
+- Adopter la convention standard Java (*optionnel, pour aller plus loin*)
+**Si vous envisagez d'utiliser un IDE (IntelliJ, Eclipse, VS Code) ou un outil de build comme Maven ou Gradle**, la convention standard consiste à remplacer Sources/ par :
+
+```text
+src/
+├── main/
+│   ├── java/       # Vos packages et fichiers .java
+│   └── resources/  # Fichiers de config, base de données locale, CSV/JSON...
+└── test/
+    └── java/       # Vos tests unitaires (ex: JUnit)
 ```
