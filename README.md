@@ -213,6 +213,13 @@ java -cp "bin;bin-test" HelpdeskTest
 <a id="licence"></a>
 ## 📄 Licence
 
+```license
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2026 teremuhamblin — helpDeskJAVA v1.2 Stable
+
+package model;
+```
+
 Ce projet est distribué sous licence **MIT**. Consultez le fichier [`LICENSE`](LICENSE) pour plus de détails.
 
 ---
