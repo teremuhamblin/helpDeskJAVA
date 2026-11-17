@@ -1,83 +1,84 @@
 # ==============================================================================
-#  JAVA : Fichiers compilés & artefacts
+#  helpDeskJAVA — .gitignore (v1.2 Stable)
 # ==============================================================================
-*.class
-*.ctxt
+
+# --- 1. Compilation Java & Binaires (générés par javac -d) ---
 bin/
+bin-test/
 out/
 build/
 target/
+*.class
+*.ctxt
 
-# Archives générées (on conserve toutefois d'éventuelles dépendances dans lib/)
-*.jar
-*.war
-*.nar
-*.ear
-*.zip
-*.tar.gz
-*.rar
-!lib/*.jar
-!Sources/lib/*.jar
-
-# Journaux de crash de la JVM
+# --- 2. Logs JVM & Fichiers d'erreur ---
+*.log
 hs_err_pid*
 replay_pid*
 
-# ==============================================================================
-#  VS CODE & EXTENSIONS JAVA (Language Support for Java / Eclipse JDT)
-# ==============================================================================
-.vscode/
-*.code-workspace
-.project
-.classpath
-.settings/
-.factorypath
-.jdt/
+# --- 3. Fichiers générés à l'exécution & Sécurité des données ---
+# Évite de publier des données sensibles (SN, IP, MAC, IMEI, utilisateurs) sur GitHub
+*.tmp
+*.bak
+parc_helpdesk.txt
+parc_rapport.csv
+data/
 
-# Autres IDE (au cas où le projet serait ouvert dans IntelliJ / NetBeans)
+# --- 4. Dépendances / Archives ---
+# Si vous ajoutez un .jar dans lib/ sans Maven/Gradle, il reste suivi grâce à !lib/*.jar
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+!lib/*.jar
+
+# --- 5. Environnements de développement (IDE) ---
+# Visual Studio Code
+.vscode/
+
+# IntelliJ IDEA
 .idea/
 *.iml
 *.iws
 *.ipr
-nbproject/
 
-# ==============================================================================
-#  FICHIERS GÉNÉRÉS PAR L'APPLICATION HELPDESK (ParcInformatique)
-# ==============================================================================
-parc.txt
-parc_helpdesk.txt
-parc_*.txt
-parc_*.csv
-*.bak
-*.tmp
-*.log
+# Eclipse
+.classpath
+.project
+.settings/
+.metadata/
 
-# ==============================================================================
-#  SYSTÈME D'EXPLOITATION & ÉDITEURS (Windows / macOS / Linux)
-# ==============================================================================
+# NetBeans
+nbproject/private/
+nbbuild/
+dist/
+nbdist/
+
+# --- 6. Futur support Gradle / Maven ---
+.gradle/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+
+# --- 7. Systèmes d'exploitation (OS) ---
+# macOS
 .DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
 Thumbs.db
 ehthumbs.db
 Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
 *~
-*.swp
-*.swo
+.directory
 
-# ==============================================================================
-#  PROTECTION DES SOURCES JAVA
-# ==============================================================================
-!Sources/**/*.java
-
-# Fichiers compilés
-bin/*.class
-*.class
-
-# Documentation générée
-doc/
-
-# IDE & Système
-.vscode/
-.idea/
-*.iml
-.DS_Store
-Thumbs.db
+# --- 8. Secrets & Variables locales ---
+.env
+.env.local
+*.key
+*.pem
