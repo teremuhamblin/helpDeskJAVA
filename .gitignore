@@ -67,3 +67,17 @@ Desktop.ini
 #  PROTECTION DES SOURCES JAVA
 # ==============================================================================
 !Sources/**/*.java
+
+# Fichiers compilés
+bin/*.class
+*.class
+
+# Documentation générée
+doc/
+
+# IDE & Système
+.vscode/
+.idea/
+*.iml
+.DS_Store
+Thumbs.db
