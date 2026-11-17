@@ -1,9 +1,8 @@
 ###### README.md >> markdown
 ---
-```markdown
-💡 Rappel rapide avant git push : vérifie que ton .gitignore à la racine contient bien bin/, bin-test/, *.class, *.tmp, *.bak et que le fichier dans model/ s'appelle bien NetworkSwitch.java (sans faute de frappe). Si tu veux, je peux aussi te générer le contenu exact du .gitignore ou de Docs/structure.md !
-```
-
+###### 💡 Rappel rapide avant git push : vérifie que ton .gitignore à la racine contient bien bin/, bin-test/, *.class, *.tmp, *.bak et que le fichier dans model/ s'appelle bien NetworkSwitch.java (sans faute de frappe). Si tu veux, je peux aussi te générer le contenu exact du .gitignore ou de Docs/structure.md !
+---
+###### 💡 Conseil sécurité : Si tu veux fournir un fichier d'exemple public sur GitHub pour tester l'import (option 11), nomme-le par exemple examples/demo_parc.txt (avec de fausses données) et ajoute !examples/ si besoin, plutôt que de commiter parc_helpdesk.txt.
 ---
 
 <a id="top"></a>
