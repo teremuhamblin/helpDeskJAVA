@@ -1,3 +1,8 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2026 teremuhamblin — helpDeskJAVA v1.2 Stable
+
+package model;
+
 package helpdesk;
 
 import helpdesk.model.Computer;
